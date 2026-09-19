@@ -72,6 +72,36 @@ jobs:
           dotnet pack src/ErrorDashboard/ErrorDashboard.csproj -c Release --no-build -p:BuildClient=false
           -p:Version=${{ steps.version.outputs.version }} -o artifacts
 
+      # The same assertions ci.yml makes, and they matter more here: this is the last point at
+      # which a bad package can still be stopped. A push to NuGet cannot be taken back.
+      - name: Check the package
+        run: |
+          shopt -s nullglob
+          packages=(artifacts/*.nupkg)
+          symbols=(artifacts/*.snupkg)
+          [ ${#packages[@]} -eq 1 ] || { echo "expected exactly one .nupkg, found ${#packages[@]}"; exit 1; }
+          [ ${#symbols[@]} -eq 1 ] || { echo "expected a .snupkg beside it - have symbols regressed?"; exit 1; }
+
+          case "${packages[0]}" in
+            *"${{ steps.version.outputs.version }}.nupkg") ;;
+            *) echo "packed ${packages[0]}, expected version ${{ steps.version.outputs.version }}"; exit 1 ;;
+          esac
+
+          contents=$(unzip -Z1 "${packages[0]}")
+          echo "$contents"
+
+          check() { echo "$contents" | grep -q "$1" || { echo "missing from the package: $1"; exit 1; }; }
+          check "lib/net10.0/Our.Umbraco.ErrorDashboard.dll"
+          check "lib/net10.0/Our.Umbraco.ErrorDashboard.xml"
+          check "^icon.png$"
+          check "^README.md$"
+          check "App_Plugins/ErrorDashboard/umbraco-package.json"
+
+          if echo "$contents" | grep -q '\.js\.map$'; then
+            echo "source maps leaked into the package"; exit 1
+          fi
+          echo "Package contents look right."
+
       - name: Upload the package
         uses: actions/upload-artifact@v7
         with:
