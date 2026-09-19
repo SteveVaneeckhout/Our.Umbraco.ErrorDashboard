@@ -7,6 +7,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-09-19
+
 First release. Targets Umbraco 18 deliberately, ahead of the v21 LTS, for teams happy to be early.
 
 ### Added
