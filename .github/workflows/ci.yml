@@ -63,6 +63,32 @@ jobs:
       - name: Pack
         run: dotnet pack src/ErrorDashboard/ErrorDashboard.csproj -c Release --no-build -p:BuildClient=false -o artifacts
 
+      # Both of these have regressed silently once already: a stray edit dropped IncludeSymbols so
+      # no .snupkg was produced, and a stale wwwroot put source maps inside the package. Neither
+      # fails a build, so assert them here instead.
+      - name: Check the package
+        run: |
+          shopt -s nullglob
+          packages=(artifacts/*.nupkg)
+          symbols=(artifacts/*.snupkg)
+          [ ${#packages[@]} -eq 1 ] || { echo "expected exactly one .nupkg, found ${#packages[@]}"; exit 1; }
+          [ ${#symbols[@]} -eq 1 ] || { echo "expected a .snupkg beside it - have symbols regressed?"; exit 1; }
+
+          contents=$(unzip -Z1 "${packages[0]}")
+          echo "$contents"
+
+          check() { echo "$contents" | grep -q "$1" || { echo "missing from the package: $1"; exit 1; }; }
+          check "lib/net10.0/Our.Umbraco.ErrorDashboard.dll"
+          check "lib/net10.0/Our.Umbraco.ErrorDashboard.xml"
+          check "^icon.png$"
+          check "^README.md$"
+          check "App_Plugins/ErrorDashboard/umbraco-package.json"
+
+          if echo "$contents" | grep -q '\.js\.map$'; then
+            echo "source maps leaked into the package"; exit 1
+          fi
+          echo "Package contents look right."
+
       # So a package can be downloaded and inspected without publishing anything.
       - name: Upload the package
         uses: actions/upload-artifact@v7
