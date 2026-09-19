@@ -49,10 +49,16 @@ jobs:
       - name: Build
         run: dotnet build Our.Umbraco.ErrorDashboard.slnx -c Release --no-restore -p:BuildClient=false
 
-      # Runs on Microsoft.Testing.Platform - see global.json. Exits 0 when a repository has no test
-      # project yet.
+      # Runs on Microsoft.Testing.Platform - see global.json. Guarded because `dotnet test` exits 1,
+      # not 0, when a solution contains no test project at all. The guard means a repository without
+      # one stays green, and starts testing automatically the day a test project is added.
       - name: Test
-        run: dotnet test --solution Our.Umbraco.ErrorDashboard.slnx -c Release --no-build -p:BuildClient=false
+        run: |
+          if ls src/*.Tests/*.csproj >/dev/null 2>&1; then
+            dotnet test --solution Our.Umbraco.ErrorDashboard.slnx -c Release --no-build -p:BuildClient=false
+          else
+            echo 'No test project in this repository yet - skipping.'
+          fi
 
       - name: Pack
         run: dotnet pack src/ErrorDashboard/ErrorDashboard.csproj -c Release --no-build -p:BuildClient=false -o artifacts
