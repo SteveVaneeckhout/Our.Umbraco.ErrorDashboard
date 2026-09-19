@@ -1,0 +1,28 @@
+version: 2
+
+updates:
+  - package-ecosystem: nuget
+    directory: /
+    schedule:
+      interval: monthly
+    open-pull-requests-limit: 5
+    groups:
+      # Umbraco's packages move together; a PR each is noise.
+      umbraco:
+        patterns:
+          - 'Umbraco.Cms.*'
+
+  - package-ecosystem: npm
+    directory: /src/ErrorDashboard/Client
+    schedule:
+      interval: monthly
+    open-pull-requests-limit: 5
+    groups:
+      umbraco-backoffice:
+        patterns:
+          - '@umbraco-cms/*'
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly

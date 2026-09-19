@@ -1,0 +1,14 @@
+{
+  "id": "ErrorDashboard",
+  "name": "ErrorDashboard",
+  "version": "1.4.1",
+  "allowTelemetry": true,
+  "extensions": [
+    {
+      "name": "Error Dashboard Bundle",
+      "alias": "ErrorDashboard.Bundle",
+      "type": "bundle",
+      "js": "/App_Plugins/ErrorDashboard/error-dashboard.js"
+    }
+  ]
+}

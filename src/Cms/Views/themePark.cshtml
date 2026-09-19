@@ -1,0 +1,39 @@
+﻿@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<ThemePark>
+@{
+    Layout = "master.cshtml";
+    var rollercoasters = Model.Children<Rollercoaster>().ToList();
+}
+<article class="page page--theme-park">
+    <h1>@Model.Name</h1>
+    <dl class="stat-list">
+        <li>
+            <dt>City</dt>
+            <dd>@Model.City</dd>
+        </li>
+        <li>
+            <dt>Opening year</dt>
+            <dd>@Model.OpeningYear</dd>
+        </li>
+    </dl>
+    <div class="richtext">@Model.Description</div>
+
+    <h2>Rollercoasters</h2>
+    @if (rollercoasters.Count > 0)
+    {
+        <ul class="card-grid">
+            @foreach (var coaster in rollercoasters)
+            {
+                <li>
+                    <a class="card" href="@coaster.Url()">
+                        <h3>@coaster.Name</h3>
+                        <p>@coaster.Manufacturer - @coaster.CoasterType</p>
+                    </a>
+                </li>
+            }
+        </ul>
+    }
+    else
+    {
+        <p class="empty-note">No rollercoasters yet.</p>
+    }
+</article>

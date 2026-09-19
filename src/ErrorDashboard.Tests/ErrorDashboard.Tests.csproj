@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IsPackable>false</IsPackable>
+    <AssemblyName>Our.Umbraco.ErrorDashboard.Tests</AssemblyName>
+    <RootNamespace>Our.Umbraco.ErrorDashboard.Tests</RootNamespace>
+    <EnableMSTestRunner>true</EnableMSTestRunner>
+    <OutputType>Exe</OutputType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!--
+      The MSTest metapackage brings the test framework, the adapter, Microsoft.NET.Test.Sdk, TRX
+      reporting and code coverage. Everything in its closure is Microsoft-owned, which is why it
+      replaced the xunit stack: xunit, xunit.runner.visualstudio and coverlet.collector were the
+      only third-party dependencies in the solution.
+    -->
+    <PackageReference Include="MSTest" Version="4.4.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Microsoft.VisualStudio.TestTools.UnitTesting" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ErrorDashboard\ErrorDashboard.csproj" />
+  </ItemGroup>
+
+</Project>

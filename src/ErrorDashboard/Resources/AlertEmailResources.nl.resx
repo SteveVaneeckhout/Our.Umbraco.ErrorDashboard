@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!--
+    Dutch (nl) translation of the alert email. Falls back to AlertEmailResources.resx for anything
+    missing here, so an untranslated key arrives in English rather than blank. Serves nl and nl-NL.
+  -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Subject" xml:space="preserve">
+    <value>Piek in fouten op {0}: {1} fouten in de afgelopen 24 uur</value>
+    <comment>{0} host, {1} observed error count.</comment>
+  </data>
+  <data name="Intro" xml:space="preserve">
+    <value>&lt;p&gt;Bezoekers lopen tegen meer fouten aan dan gebruikelijk op &lt;strong&gt;{0}&lt;/strong&gt;.&lt;/p&gt;</value>
+    <comment>{0} is the host, already HTML-encoded. Keep the tags.</comment>
+  </data>
+  <data name="Last24Hours" xml:space="preserve">
+    <value>&lt;li&gt;&lt;strong&gt;Afgelopen 24 uur:&lt;/strong&gt; {0} fouten&lt;/li&gt;</value>
+  </data>
+  <data name="Usual" xml:space="preserve">
+    <value>&lt;li&gt;&lt;strong&gt;Gebruikelijk voor deze site:&lt;/strong&gt; {0} per dag&lt;/li&gt;</value>
+  </data>
+  <data name="Severity" xml:space="preserve">
+    <value>&lt;li&gt;&lt;strong&gt;Ernst:&lt;/strong&gt; {0} keer de normale dagelijkse variatie van deze site (over {1} dagen historie)&lt;/li&gt;</value>
+    <comment>{0} score, {1} baseline days.</comment>
+  </data>
+  <data name="WorstUrls" xml:space="preserve">
+    <value>&lt;p&gt;&lt;strong&gt;Slechtste URL's in dat venster:&lt;/strong&gt;&lt;/p&gt;</value>
+  </data>
+  <data name="Outro" xml:space="preserve">
+    <value>&lt;p&gt;Open het &lt;em&gt;Fouten&lt;/em&gt;-dashboard in de sectie Instellingen van de backoffice voor het volledige overzicht.&lt;/p&gt;</value>
+  </data>
+  <data name="CoverageNote" xml:space="preserve">
+    <value>Gerapporteerd door browsers via Network Error Logging, wat alleen browsers op basis van Chromium ondersteunen - de werkelijke aantallen liggen hoger.</value>
+  </data>
+</root>

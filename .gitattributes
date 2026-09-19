@@ -1,0 +1,23 @@
+# Normalise line endings in the repository. Without this, a Windows clone commits CRLF and every
+# file a Linux CI runner touches looks modified.
+* text=auto eol=lf
+
+# Windows-only scripts must keep CRLF in the working tree.
+*.ps1 text eol=crlf
+*.cmd text eol=crlf
+*.bat text eol=crlf
+
+# Never line-ending-convert these. The .pfx in particular is a certificate: rewriting bytes in it
+# makes Kestrel fail to start with an opaque error.
+*.pfx binary
+*.snk binary
+*.png binary
+*.jpg binary
+*.gif binary
+*.ico binary
+*.woff binary
+*.woff2 binary
+
+# Generated, so keep them out of diffs and language statistics.
+src/*/Client/src/api/** linguist-generated=true
+src/Cms/umbraco/models/** linguist-generated=true

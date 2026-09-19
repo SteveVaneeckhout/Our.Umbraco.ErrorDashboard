@@ -1,0 +1,71 @@
+﻿@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+@{
+    var current = Model;
+    IPublishedContent? root = null;
+    if (current != null)
+    {
+        root = current.Root();
+    }
+    IEnumerable<Link>? headerLinks = null;
+    IEnumerable<Link>? footerLinks = null;
+    var siteName = "Coaster World";
+    var rootUrl = "/";
+    if (root != null)
+    {
+        headerLinks = root.Value<IEnumerable<Link>>("headerNavigation");
+        footerLinks = root.Value<IEnumerable<Link>>("footerNavigation");
+        siteName = root.Name;
+        rootUrl = root.Url();
+    }
+    var pageName = siteName;
+    if (current != null)
+    {
+        pageName = current.Name;
+    }
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@pageName - @siteName</title>
+    <link rel="stylesheet" href="~/css/theme.css" />
+</head>
+<body>
+    <header class="site-header">
+        <div class="site-header__inner">
+            <a class="site-title" href="@rootUrl">@siteName</a>
+            @if (headerLinks is not null && headerLinks.Any())
+            {
+                <nav class="site-nav">
+                    <ul>
+                        @foreach (var link in headerLinks)
+                        {
+                            <li><a href="@link.Url">@link.Name</a></li>
+                        }
+                    </ul>
+                </nav>
+            }
+        </div>
+    </header>
+
+    <main class="site-main">
+        @RenderBody()
+    </main>
+
+    <footer class="site-footer">
+        <div class="site-footer__inner">
+            <p>© @DateTime.Now.Year @siteName</p>
+            @if (footerLinks is not null && footerLinks.Any())
+            {
+                <ul>
+                    @foreach (var link in footerLinks)
+                    {
+                        <li><a href="@link.Url">@link.Name</a></li>
+                    }
+                </ul>
+            }
+        </div>
+    </footer>
+</body>
+</html>

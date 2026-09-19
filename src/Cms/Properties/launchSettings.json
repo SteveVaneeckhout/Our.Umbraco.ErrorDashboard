@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json.schemastore.org/launchsettings.json",
+  "profiles": {
+    "Umbraco.Web.UI": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "dotnetRunMessages": true,
+      "launchUrl": "https://testsite1.127.0.0.1.nip.io:44366",
+      "applicationUrl": "https://testsite1.127.0.0.1.nip.io:44366;http://testsite1.127.0.0.1.nip.io:52410"
+    }
+  }
+}

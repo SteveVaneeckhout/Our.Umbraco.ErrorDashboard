@@ -1,0 +1,29 @@
+﻿@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Country>
+@{
+    Layout = "master.cshtml";
+    var themeParks = Model.Children<ThemePark>().ToList();
+}
+<article class="page page--country">
+    <h1>@Model.Name</h1>
+    <p class="page__meta">@Model.Description</p>
+
+    <h2>Theme parks</h2>
+    @if (themeParks.Count > 0)
+    {
+        <ul class="card-grid">
+            @foreach (var themePark in themeParks)
+            {
+                <li>
+                    <a class="card" href="@themePark.Url()">
+                        <h3>@themePark.Name</h3>
+                        <p>@themePark.City</p>
+                    </a>
+                </li>
+            }
+        </ul>
+    }
+    else
+    {
+        <p class="empty-note">No theme parks yet.</p>
+    }
+</article>

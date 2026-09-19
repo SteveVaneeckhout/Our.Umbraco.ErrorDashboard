@@ -1,0 +1,37 @@
+{
+  "$schema": "https://marketplace.umbraco.com/umbraco-marketplace-schema.json",
+  "PackageId": "Our.Umbraco.ErrorDashboard",
+  "Title": "Error Dashboard for Umbraco",
+  "Description": "Collects 404s, 500s, TLS and DNS failures from visitors' browsers using Network Error Logging, shows them on three Settings dashboards, and emails subscribed users when a site's error volume goes abnormal — judged against the site's own history rather than a threshold you had to guess. Note that NEL is Chromium-only, so every figure is a lower bound.",
+  "Category": "Backoffice Extensions",
+  "AlternateCategory": "Site Performance",
+  "PackageType": "Package",
+  "Tags": [
+    "errors",
+    "monitoring",
+    "nel",
+    "network-error-logging",
+    "404",
+    "alerts",
+    "dashboard"
+  ],
+  "DocumentationUrl": "https://github.com/SteveVaneeckhout/Our.Umbraco.ErrorDashboard/tree/main/docs",
+  "IssueTrackerUrl": "https://github.com/SteveVaneeckhout/Our.Umbraco.ErrorDashboard/issues",
+  "SourceCodeUrl": "https://github.com/SteveVaneeckhout/Our.Umbraco.ErrorDashboard",
+  "LicenseTypes": [
+    "Free"
+  ],
+  "Screenshots": [
+    {
+      "ImageUrl": "https://raw.githubusercontent.com/SteveVaneeckhout/Our.Umbraco.ErrorDashboard/main/docs/img/overview.png"
+    }
+  ],
+  "AuthorDetails": {
+    "Name": "Steve Vaneeckhout",
+    "Url": "https://github.com/SteveVaneeckhout"
+  },
+  "PackagesByAuthor": [
+    "Our.Umbraco.ContentDashboard",
+    "Our.Umbraco.TrueCopy"
+  ]
+}

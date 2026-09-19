@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="src/Cms/Cms.csproj" />
+  <Project Path="src/ErrorDashboard/ErrorDashboard.csproj" />
+  <Project Path="src/ErrorDashboard.Tests/ErrorDashboard.Tests.csproj" />
+</Solution>

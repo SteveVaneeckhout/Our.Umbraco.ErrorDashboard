@@ -1,0 +1,8 @@
+# GitHub Pages serves this folder (Settings -> Pages -> main /docs). It also serves
+# umbraco-marketplace.json, which the Umbraco Marketplace reads from the package project URL.
+title: Error Dashboard for Umbraco
+description: The errors your visitors hit, not the ones your server noticed.
+theme: jekyll-theme-cayman
+
+exclude:
+  - upgrading.md

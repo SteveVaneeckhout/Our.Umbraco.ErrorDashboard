@@ -1,0 +1,6 @@
+{
+  "//": "The .NET 10 SDK refuses to run Microsoft.Testing.Platform test projects through the legacy VSTest target, so `dotnet test` has to be opted in to MTP mode here. Without this the MSTest projects build fine and fail the moment anything tries to run them. In MTP mode a project argument is passed as `dotnet test --project <path>`, not positionally.",
+  "test": {
+    "runner": "Microsoft.Testing.Platform"
+  }
+}

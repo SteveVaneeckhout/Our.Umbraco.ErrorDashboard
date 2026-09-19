@@ -1,0 +1,28 @@
+﻿@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Continent>
+@{
+    Layout = "master.cshtml";
+    var countries = Model.Children<Country>().ToList();
+}
+<article class="page page--continent">
+    <h1>@Model.Name</h1>
+    <p class="page__meta">@Model.Description</p>
+
+    <h2>Countries</h2>
+    @if (countries.Count > 0)
+    {
+        <ul class="card-grid">
+            @foreach (var country in countries)
+            {
+                <li>
+                    <a class="card" href="@country.Url()">
+                        <h3>@country.Name</h3>
+                    </a>
+                </li>
+            }
+        </ul>
+    }
+    else
+    {
+        <p class="empty-note">No countries yet.</p>
+    }
+</article>

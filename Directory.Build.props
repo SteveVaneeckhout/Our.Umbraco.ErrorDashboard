@@ -1,0 +1,30 @@
+<Project>
+
+  <!--
+    Shared identity for everything in this repository. Only the package project is packable; the Cms
+    host is a development harness and the test project sets IsPackable itself.
+  -->
+  <PropertyGroup>
+    <Version>1.0.0</Version>
+    <Authors>Steve Vaneeckhout</Authors>
+    <Company>Steve Vaneeckhout</Company>
+    <Copyright>Copyright © Steve Vaneeckhout</Copyright>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://stevevaneeckhout.github.io/Our.Umbraco.ErrorDashboard/</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/SteveVaneeckhout/Our.Umbraco.ErrorDashboard</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <!--
+      The XML documentation file ships in the package, so consumers get IntelliSense on the types
+      that matter. Two of its warnings are suppressed: CS1591 (missing XML comment on a public
+      member) fires on every view-model property and controller action, and CS1573 (a parameter
+      with no param tag) fires wherever the code deliberately documents only its non-obvious
+      parameters. Both would bury the warnings worth reading. The extension surface is documented
+      on purpose, not by rule.
+    -->
+    <NoWarn>$(NoWarn);CS1591;CS1573</NoWarn>
+  </PropertyGroup>
+
+</Project>

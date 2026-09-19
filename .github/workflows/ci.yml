@@ -1,0 +1,66 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  # A newer push to the same branch makes this run pointless.
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: '10.0.x'
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: src/ErrorDashboard/Client/package-lock.json
+
+      # Build the client explicitly. The csproj has a target that does this, but only when the
+      # bundle is missing - it would silently reuse a stale wwwroot, which is exactly how source
+      # maps once ended up inside a release package.
+      - name: Build the backoffice client
+        working-directory: src/ErrorDashboard/Client
+        run: |
+          npm ci
+          npm run build
+
+      - name: Restore
+        run: dotnet restore Our.Umbraco.ErrorDashboard.slnx
+
+      - name: Check formatting
+        run: dotnet format Our.Umbraco.ErrorDashboard.slnx --verify-no-changes --no-restore
+
+      - name: Build
+        run: dotnet build Our.Umbraco.ErrorDashboard.slnx -c Release --no-restore -p:BuildClient=false
+
+      # Runs on Microsoft.Testing.Platform - see global.json. Exits 0 when a repository has no test
+      # project yet.
+      - name: Test
+        run: dotnet test --solution Our.Umbraco.ErrorDashboard.slnx -c Release --no-build -p:BuildClient=false
+
+      - name: Pack
+        run: dotnet pack src/ErrorDashboard/ErrorDashboard.csproj -c Release --no-build -p:BuildClient=false -o artifacts
+
+      # So a package can be downloaded and inspected without publishing anything.
+      - name: Upload the package
+        uses: actions/upload-artifact@v7
+        with:
+          name: Our.Umbraco.ErrorDashboard-nupkg
+          path: artifacts/*
+          if-no-files-found: error

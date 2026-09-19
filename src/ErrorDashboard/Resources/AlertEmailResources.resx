@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!--
+    The English source for the alert email. A translation is a sibling file with a culture suffix -
+    AlertEmailResources.nl.resx - which .NET builds into a satellite assembly and picks up through
+    the usual resource fallback, so nl-NL falls back to nl and nl falls back to this file.
+
+    This is the only text in the package that cannot live in the client dictionary: it is delivered
+    by email, with no browser to localize it. AlertService picks the culture per recipient from
+    IUser.Language and groups subscribers by it, so one send can produce several languages.
+
+    Placeholders are positional ({0}, {1}) and are formatted for the recipient's culture, which is
+    what makes a Dutch reader see 4,7 where an English one sees 4.7.
+  -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Subject" xml:space="preserve">
+    <value>Error spike on {0}: {1} errors in the last 24 hours</value>
+    <comment>{0} host, {1} observed error count.</comment>
+  </data>
+  <data name="Intro" xml:space="preserve">
+    <value>&lt;p&gt;Visitors are hitting more errors than usual on &lt;strong&gt;{0}&lt;/strong&gt;.&lt;/p&gt;</value>
+    <comment>{0} is the host, already HTML-encoded. Keep the tags.</comment>
+  </data>
+  <data name="Last24Hours" xml:space="preserve">
+    <value>&lt;li&gt;&lt;strong&gt;Last 24 hours:&lt;/strong&gt; {0} errors&lt;/li&gt;</value>
+  </data>
+  <data name="Usual" xml:space="preserve">
+    <value>&lt;li&gt;&lt;strong&gt;Usual for this site:&lt;/strong&gt; {0} per day&lt;/li&gt;</value>
+  </data>
+  <data name="Severity" xml:space="preserve">
+    <value>&lt;li&gt;&lt;strong&gt;Severity:&lt;/strong&gt; {0} times this site's normal day-to-day variation (over {1} days of history)&lt;/li&gt;</value>
+    <comment>{0} score, {1} baseline days.</comment>
+  </data>
+  <data name="WorstUrls" xml:space="preserve">
+    <value>&lt;p&gt;&lt;strong&gt;Worst URLs in that window:&lt;/strong&gt;&lt;/p&gt;</value>
+  </data>
+  <data name="Outro" xml:space="preserve">
+    <value>&lt;p&gt;Open the &lt;em&gt;Errors&lt;/em&gt; dashboard in the Settings section of the backoffice for the full breakdown.&lt;/p&gt;</value>
+  </data>
+  <data name="CoverageNote" xml:space="preserve">
+    <value>Reported by browsers using Network Error Logging, which only Chromium-based browsers support - the real totals are higher.</value>
+  </data>
+</root>

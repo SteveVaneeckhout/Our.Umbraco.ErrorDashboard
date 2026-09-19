@@ -1,0 +1,9 @@
+﻿@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<NewsItem>
+@{
+    Layout = "master.cshtml";
+}
+<article class="page page--news-item">
+    <h1>@Model.Name</h1>
+    <p class="page__meta">@Model.PublishDate.ToString("yyyy-MM-dd")</p>
+    <div class="richtext">@Model.ArticleBody</div>
+</article>

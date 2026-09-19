@@ -1,0 +1,29 @@
+﻿@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<NewsOverview>
+@{
+    Layout = "master.cshtml";
+    var newsItems = Model.Children<NewsItem>().OrderByDescending(x => x.PublishDate).ToList();
+}
+<article class="page page--news-overview">
+    <h1>@Model.Name</h1>
+    <p class="page__meta">@Model.IntroText</p>
+
+    @if (newsItems.Count > 0)
+    {
+        <ul class="card-grid">
+            @foreach (var item in newsItems)
+            {
+                <li>
+                    <a class="card" href="@item.Url()">
+                        <time>@item.PublishDate.ToString("yyyy-MM-dd")</time>
+                        <h3>@item.Name</h3>
+                        <p>@item.Summary</p>
+                    </a>
+                </li>
+            }
+        </ul>
+    }
+    else
+    {
+        <p class="empty-note">No news yet.</p>
+    }
+</article>

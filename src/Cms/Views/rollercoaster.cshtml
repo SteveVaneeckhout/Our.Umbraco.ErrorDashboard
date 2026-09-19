@@ -1,0 +1,34 @@
+﻿@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Rollercoaster>
+@{
+    Layout = "master.cshtml";
+}
+<article class="page page--rollercoaster">
+    <h1>@Model.Name</h1>
+    <dl class="stat-list">
+        <li>
+            <dt>Manufacturer</dt>
+            <dd>@Model.Manufacturer</dd>
+        </li>
+        <li>
+            <dt>Type</dt>
+            <dd>@Model.CoasterType</dd>
+        </li>
+        <li>
+            <dt>Height</dt>
+            <dd>@Model.HeightMeters m</dd>
+        </li>
+        <li>
+            <dt>Top speed</dt>
+            <dd>@Model.TopSpeedKph km/h</dd>
+        </li>
+        <li>
+            <dt>Inversions</dt>
+            <dd>@Model.Inversions</dd>
+        </li>
+        <li>
+            <dt>Opened</dt>
+            <dd>@Model.OpeningDate.ToString("yyyy-MM-dd")</dd>
+        </li>
+    </dl>
+    <div class="richtext">@Model.Description</div>
+</article>
