@@ -7,7 +7,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
-## [18.0.0]
+## [18.0.0] - 2026-09-26
 
 Versioning now follows the Umbraco major: 18.x targets Umbraco 18, and a 17.x line on the
 `v17/main` branch targets the Umbraco 17 LTS. No functional change from 1.0.0.
