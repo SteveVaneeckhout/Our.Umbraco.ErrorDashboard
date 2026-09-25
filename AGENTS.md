@@ -16,6 +16,24 @@ scripts/            tooling outside the build
 docs/               architecture, development, upgrading
 ```
 
+## Branches
+
+`main` follows the latest Umbraco. Each supported LTS gets a long-lived `v<major>/main` branch -
+currently `v17/main`, for Umbraco 17 - and the **package major matches the Umbraco major** (18.x
+from `main`, 17.x from `v17/main`), all under the one NuGet ID.
+
+- Work on an LTS branch in its **own worktree**
+  (`git worktree add ../Our.Umbraco.ErrorDashboard-v17 v17/main`). The SQLite database,
+  `node_modules`, `wwwroot` and `bin/obj` are gitignored, so a plain checkout would share them, and
+  an older Umbraco cannot boot on a database the newer one has migrated. Both sites use port 44366,
+  so only one runs at a time.
+- **Release order matters.** `dotnet add package` takes the highest stable version and NuGet only
+  *warns* (NU1608) when its dependencies do not fit, so an LTS release must never be the highest
+  version on NuGet - `main` must always have released a higher major first. Publish LTS GitHub
+  Releases with *Set as latest release* unticked.
+- A fix that applies to both lines is **cherry-picked** across. Never merge the branches into each
+  other: the port itself would come along with the fix.
+
 Inside `src/ErrorDashboard/`:
 
 ```

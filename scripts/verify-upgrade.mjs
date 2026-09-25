@@ -113,7 +113,10 @@ function checkStatic() {
       skip(`${project} Umbraco references`, "none with a literal version");
       continue;
     }
-    const wrong = refs.filter(([, , v]) => v !== cmsVersion);
+    // A range like "[18.2.0,19.0.0)" is compared on its lower bound - that is the version the package
+    // compiles against, and the one the harness has to run.
+    const floor = (v) => v.replace(/^[[(]/, "").split(",")[0].trim();
+    const wrong = refs.filter(([, , v]) => floor(v) !== cmsVersion);
     if (wrong.length === 0) pass(`${project} Umbraco references`, `${refs.length} at ${cmsVersion}`);
     else fail(`${project} Umbraco references`, wrong.map(([, n, v]) => `${n}=${v}`).join(", ") + ` (expected ${cmsVersion})`);
   }

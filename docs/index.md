@@ -18,7 +18,12 @@ NEL is Chromium-only, so every figure is a lower bound.
 dotnet add package Our.Umbraco.ErrorDashboard
 ```
 
-Requires Umbraco 18 and .NET 10.
+Requires Umbraco 18 and .NET 10. On the **Umbraco 17 LTS**, install the 17.x line instead - the
+package major follows the Umbraco major:
+
+```bash
+dotnet add package Our.Umbraco.ErrorDashboard --version "17.*"
+```
 
 ![Error Dashboard for Umbraco](img/overview.png)
 

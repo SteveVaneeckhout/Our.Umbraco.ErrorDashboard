@@ -2,7 +2,8 @@ name: CI
 
 on:
   push:
-    branches: [main]
+    # main follows the latest Umbraco; each v<major>/main branch is a supported LTS line.
+    branches: [main, 'v*/main']
   pull_request:
   workflow_dispatch:
 

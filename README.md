@@ -43,10 +43,28 @@ failures that never reach your logs at all.
 - A site served over **HTTPS** with a valid certificate
 - SQL Server or SQLite — both are supported, and no SQL is provider-specific
 
+## Versions
+
+The package major follows the Umbraco major, so the version tells you which one you need.
+
+| Umbraco | Package | Branch |
+| --- | --- | --- |
+| 18 | 18.x | [`main`](https://github.com/SteveVaneeckhout/Our.Umbraco.ErrorDashboard/tree/main) |
+| 17 LTS | 17.x | [`v17/main`](https://github.com/SteveVaneeckhout/Our.Umbraco.ErrorDashboard/tree/v17/main) |
+
+1.0.0 was the first Umbraco 18 release, before this scheme; 18.0.0 is the same package.
+
 ## Install
 
 ```bash
 dotnet add package Our.Umbraco.ErrorDashboard
+```
+
+On Umbraco 17, ask for the 17.x line explicitly - a plain install picks the newest version, which
+targets Umbraco 18:
+
+```bash
+dotnet add package Our.Umbraco.ErrorDashboard --version "17.*"
 ```
 
 The five `errorDashboard*` tables are created on first boot by a package migration. That migration is

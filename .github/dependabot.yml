@@ -1,5 +1,8 @@
 version: 2
 
+# Dependabot only reads this file from the default branch, so the LTS branches are configured here
+# too, with target-branch. main follows the latest Umbraco; v17/main stays on Umbraco 17.
+
 updates:
   - package-ecosystem: nuget
     directory: /
@@ -24,5 +27,43 @@ updates:
 
   - package-ecosystem: github-actions
     directory: /
+    schedule:
+      interval: monthly
+
+  # Umbraco 17 LTS. A major bump of anything Umbraco-versioned would be a port to 18, which is what
+  # main is for - so only minors and patches are proposed here.
+  - package-ecosystem: nuget
+    directory: /
+    target-branch: v17/main
+    schedule:
+      interval: monthly
+    open-pull-requests-limit: 5
+    groups:
+      umbraco:
+        patterns:
+          - 'Umbraco.Cms.*'
+    ignore:
+      - dependency-name: 'Umbraco.Cms*'
+        update-types: ['version-update:semver-major']
+      - dependency-name: 'uSync'
+        update-types: ['version-update:semver-major']
+
+  - package-ecosystem: npm
+    directory: /src/ErrorDashboard/Client
+    target-branch: v17/main
+    schedule:
+      interval: monthly
+    open-pull-requests-limit: 5
+    groups:
+      umbraco-backoffice:
+        patterns:
+          - '@umbraco-cms/*'
+    ignore:
+      - dependency-name: '@umbraco-cms/*'
+        update-types: ['version-update:semver-major']
+
+  - package-ecosystem: github-actions
+    directory: /
+    target-branch: v17/main
     schedule:
       interval: monthly
