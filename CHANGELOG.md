@@ -7,6 +7,16 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [17.0.0]
+
+The Umbraco 17 LTS line, built from the `v17/main` branch. Same features as 18.0.0, pinned to
+`[17.7.0,18.0.0)`.
+
+### Changed
+
+- The backoffice API's OpenAPI document is generated with Swashbuckle, as Umbraco 17 does, and is
+  served at `/umbraco/swagger/errordashboard/swagger.json`.
+
 ## [18.0.0]
 
 Versioning now follows the Umbraco major: 18.x targets Umbraco 18, and a 17.x line on the

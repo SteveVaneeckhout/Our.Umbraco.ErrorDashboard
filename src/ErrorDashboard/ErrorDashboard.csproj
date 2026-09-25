@@ -13,7 +13,7 @@
     <Product>Error Dashboard for Umbraco</Product>
     <Title>Error Dashboard for Umbraco</Title>
     <Description>Tracks the errors real visitors actually hit - 404s, 500s, TLS and DNS failures - by asking their browsers to report them through Network Error Logging, then shows them on three Settings dashboards and emails subscribed users when a site's error volume goes abnormal. Server logs record what the server thinks it served; NEL moves the observation point into the browser, so it also catches certificate problems, connection resets and failures on assets served from a CDN. Note that NEL is Chromium-only, so every figure is a lower bound rather than a count.</Description>
-    <PackageTags>umbraco umbraco-marketplace umbraco-package umbraco-18 backoffice dashboard errors monitoring nel network-error-logging 404 alerts</PackageTags>
+    <PackageTags>umbraco umbraco-marketplace umbraco-package umbraco-17 backoffice dashboard errors monitoring nel network-error-logging 404 alerts</PackageTags>
     <PackageIcon>icon.png</PackageIcon>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
@@ -23,25 +23,18 @@
 
   <!-- Per-project - with versions -->
   <ItemGroup>
-    <PackageReference Include="Umbraco.Cms.Api.Common" Version="[18.2.0,19.0.0)" />
-    <PackageReference Include="Umbraco.Cms.Api.Management" Version="[18.2.0,19.0.0)" />
-    <PackageReference Include="Umbraco.Cms.Web.Common" Version="[18.2.0,19.0.0)" />
-    <PackageReference Include="Umbraco.Cms.Web.Website" Version="[18.2.0,19.0.0)" />
+    <PackageReference Include="Umbraco.Cms.Api.Common" Version="[17.7.0,18.0.0)" />
+    <PackageReference Include="Umbraco.Cms.Api.Management" Version="[17.7.0,18.0.0)" />
+    <PackageReference Include="Umbraco.Cms.Web.Common" Version="[17.7.0,18.0.0)" />
+    <PackageReference Include="Umbraco.Cms.Web.Website" Version="[17.7.0,18.0.0)" />
 
     <!--
-      Microsoft.AspNetCore.OpenApi is available transitively from the Umbraco packages above, but we
-      take a direct dependency here because extension code directly uses types from this package
-      (IOpenApiDocumentTransformer, IOpenApiOperationTransformer, etc.) and from Microsoft.OpenApi
-      (OpenApiInfo). Without a direct reference, this project's Microsoft.AspNetCore.OpenApi version
-      is determined solely by NuGet's transitive resolution, which can resolve to a different version
-      than the host site project (e.g. a newer patch). When that happens, the different
-      Microsoft.OpenApi versions can conflict at runtime, causing custom OpenAPI documents registered
-      by the extension to fail to appear.
-      Most other transitive dependencies don't have this problem because extension code doesn't use
-      their types directly - only Microsoft.AspNetCore.OpenApi / Microsoft.OpenApi types are
-      referenced in the composer.
+      Umbraco 17 still generates OpenAPI with Swashbuckle. The composer uses its SwaggerGenOptions
+      and Microsoft.OpenApi's OpenApiInfo, and both come in through Umbraco.Cms.Api.Management at
+      the version Umbraco itself was built against. The 17 extension template references
+      Swashbuckle.AspNetCore directly, but this package depends on nothing outside Microsoft and
+      Umbraco, so the transitive reference is used instead.
     -->
-    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.12" />
   </ItemGroup>
 
   <ItemGroup>

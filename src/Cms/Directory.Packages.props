@@ -10,8 +10,8 @@
     <UmbracoAppLocalIcuVersion Condition="'$(UmbracoAppLocalIcuVersion)' == ''">72.1.0.3</UmbracoAppLocalIcuVersion>
   </PropertyGroup>
   <ItemGroup>
-    <PackageVersion Include="Umbraco.Cms" Version="18.2.0" />
+    <PackageVersion Include="Umbraco.Cms" Version="17.7.0" />
     <PackageVersion Include="Microsoft.ICU.ICU4C.Runtime" Version="$(UmbracoAppLocalIcuVersion)" />
-    <PackageVersion Include="uSync" Version="18.1.4" />
+    <PackageVersion Include="uSync" Version="17.4.2" />
   </ItemGroup>
 </Project>

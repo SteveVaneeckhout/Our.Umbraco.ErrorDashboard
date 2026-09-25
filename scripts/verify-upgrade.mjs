@@ -231,18 +231,18 @@ async function checkLive() {
   section("OpenAPI documents");
   const docs = new Map();
   for (const { apiName } of PACKAGES) {
-    const url = `${BASE}/umbraco/openapi/${apiName}.json`;
+    const url = `${BASE}/umbraco/swagger/${apiName}/swagger.json`;
     const { status, body } = await getJson(url, auth);
     if (status !== 200) {
-      fail(`openapi/${apiName}.json`, `HTTP ${status} - a 500 here usually means a duplicate ProducesResponseType(401/403)`);
+      fail(`swagger/${apiName}/swagger.json`, `HTTP ${status} - a 500 here usually means a duplicate ProducesResponseType(401/403)`);
       continue;
     }
     if (!body?.paths) {
-      fail(`openapi/${apiName}.json`, "200 but no paths in the document");
+      fail(`swagger/${apiName}/swagger.json`, "200 but no paths in the document");
       continue;
     }
     docs.set(apiName, body);
-    pass(`openapi/${apiName}.json`, `${Object.keys(body.paths).length} path(s)`);
+    pass(`swagger/${apiName}/swagger.json`, `${Object.keys(body.paths).length} path(s)`);
   }
 
   // --- Served client bundles. ---

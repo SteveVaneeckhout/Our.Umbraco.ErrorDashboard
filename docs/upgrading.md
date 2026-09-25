@@ -5,7 +5,11 @@ What to check when the CMS version moves, and — more usefully — *why* those 
 `scripts/verify-upgrade.mjs` does the mechanical half. This file is the half that needs judgement:
 which surfaces are actually fragile, and which failures only ever show up in a browser.
 
-> **Last verified against:** 18.1.1 → 18.2.0.
+> **Last verified against:** 18.1.1 → 18.2.0, then ported to **17.7.0** for this `v17/main` branch.
+> Examples naming 18.x versions are from the original pass on `main` and are kept as history; on
+> this branch substitute the 17.x pins. The port added nothing new to the fragile surfaces below:
+> the uSync fixture imports unchanged, and the client type-checks against
+> `@umbraco-cms/backoffice@17.7.0` without an edit.
 > The version-specific claims below (core export names, alias values) were true at that point.
 > When one goes stale, correct it or delete it — a wrong entry here is worse than a missing one,
 > because it reads as authoritative.
@@ -185,11 +189,13 @@ list reads fine but page 2 throws, that is the cause. The script's paging probe 
 
 ### The OpenAPI `ProducesResponseType` trap
 
-Never declare a `401` **or** `403` on a controller action. Umbraco's
-`BackOfficeSecurityRequirementsTransformer` adds both to every operation, and declaring either
-yourself throws `An item with the same key has already been added` while the document generates —
-surfacing as a 500 on `/umbraco/openapi/<apiname>.json` with nothing in the trace naming your
-controller.
+This is an Umbraco 18 trap, from its Microsoft.AspNetCore.OpenApi pipeline: there,
+`BackOfficeSecurityRequirementsTransformer` adds `401` and `403` to every operation, and declaring
+either yourself throws `An item with the same key has already been added`, surfacing as a 500 on
+`/umbraco/openapi/<apiname>.json`. Umbraco 17's Swashbuckle filter does not have it - `Subscribers`
+and `Recompute` declare a `403` and `/umbraco/swagger/errordashboard/swagger.json` generates fine on
+17.7.0. The swagger probe in the verify script still runs first, because it is still the cheapest
+way to catch a controller that no longer binds or DI that no longer resolves.
 
 ## Things that look like upgrade fallout but are not
 

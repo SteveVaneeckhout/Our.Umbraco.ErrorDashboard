@@ -5,7 +5,7 @@
     host is a development harness and the test project sets IsPackable itself.
   -->
   <PropertyGroup>
-    <Version>18.0.0</Version>
+    <Version>17.0.0</Version>
     <Authors>Steve Vaneeckhout</Authors>
     <Company>Steve Vaneeckhout</Company>
     <Copyright>Copyright © Steve Vaneeckhout</Copyright>

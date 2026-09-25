@@ -191,7 +191,13 @@ public sealed class AlertService : IAlertService
 
             try
             {
-                await _emailSender.SendAsync(message, UmbConstants.Web.EmailTypes.Notification);
+                // The overload with expires, spelled out: on Umbraco 17 the two-argument call binds to
+                // an obsolete overload instead.
+                await _emailSender.SendAsync(
+                    message,
+                    UmbConstants.Web.EmailTypes.Notification,
+                    enableNotification: false,
+                    expires: null);
             }
             catch (Exception ex)
             {

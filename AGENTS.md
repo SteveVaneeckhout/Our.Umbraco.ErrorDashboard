@@ -5,7 +5,7 @@ once already; none of it is guesswork.
 
 ## What this is
 
-`Our.Umbraco.ErrorDashboard`: an Umbraco 18 backoffice package, browser-reported 404/500/TLS errors (Network Error Logging) with anomaly alerting. It is published to NuGet and
+`Our.Umbraco.ErrorDashboard`: an Umbraco 17 LTS backoffice package, browser-reported 404/500/TLS errors (Network Error Logging) with anomaly alerting. It is published to NuGet and
 listed on the Umbraco Marketplace, so the public surface and the README are part of the product.
 
 ```
@@ -33,6 +33,11 @@ from `main`, 17.x from `v17/main`), all under the one NuGet ID.
   Releases with *Set as latest release* unticked.
 - A fix that applies to both lines is **cherry-picked** across. Never merge the branches into each
   other: the port itself would come along with the fix.
+
+**This is the `v17/main` branch.** What differs from `main` is deliberately small: the version pins,
+the OpenAPI composer (Umbraco 17 still uses Swashbuckle - see *OpenAPI* below), the regenerated
+`Client/src/api`, one `IEmailSender.SendAsync` call, the uSync folder name, and the docs. The
+services, the controllers and the client source are otherwise the same code.
 
 Inside `src/ErrorDashboard/`:
 
@@ -64,7 +69,7 @@ Backoffice at **https://localhost:44366/umbraco**, admin `hello@example.com`, pa
 `https://testsite1.127.0.0.1.nip.io:44366/`, which is the host the single uSync domain binds to.
 Everything secret in this repository is deliberately public - it is a throwaway local harness.
 
-On first boot the site creates a SQLite database, installs unattended, and imports `src/Cms/uSync/v18`.
+On first boot the site creates a SQLite database, installs unattended, and imports `src/Cms/uSync/v17`.
 
 **A running site holds the package DLL open**, so stop it before `dotnet build`:
 `Get-Process -Name Cms | Stop-Process -Force`.
@@ -156,11 +161,25 @@ The `.resx` files in `src/ErrorDashboard/Resources` cover the one surface a brow
 
 ## OpenAPI
 
-**`[ProducesResponseType(401)]` - and `(403)` - break the OpenAPI document.** Umbraco's
-`BackOfficeSecurityRequirementsTransformer` adds **both** to every operation, so declaring either
-yourself throws "An item with the same key has already been added. Key: 401" when the document is
-generated. It surfaces as a 500 on `/umbraco/openapi/errordashboard.json`, with nothing in the stack trace
-pointing at your controller.
+**Umbraco 17 generates OpenAPI with Swashbuckle**; Umbraco 18 replaced it with
+Microsoft.AspNetCore.OpenApi, which is why `ErrorDashboardApiComposer` is the one file that really
+differs between the branches. The document is at `/umbraco/swagger/errordashboard/swagger.json`
+(OpenAPI 3.0), not `/umbraco/openapi/errordashboard.json`.
+
+- **Operation IDs are named HTTP method + route** (`GetAlerts`, `PutSubscription`) by
+  `ErrorDashboardOperationIdHandler`. hey-api derives the client's function names from them, and
+  that scheme reproduces exactly the names `main`'s generator gives, so `Client/src` needs no
+  changes between the branches. Note it is the **route**, not the action: `UpdateSubscription` is
+  `PUT subscription`, and `main` calls it `putSubscription`. ContentDashboard's v17 handler uses the
+  action name, which would rename it `putUpdateSubscription` here - do not copy that one across.
+- **Swashbuckle is used transitively**, through `Umbraco.Cms.Api.Management`. The 17 extension
+  template references `Swashbuckle.AspNetCore` directly; this package does not, because of the
+  Microsoft-or-Umbraco dependency rule above.
+- Swashbuckle marks request bodies optional, so the regenerated client types `body?:` rather than
+  `body:`. Harmless, but it is why `src/api` differs from `main`'s.
+- The explicit `[ProducesResponseType(StatusCodes.Status403Forbidden)]` on `Subscribers` and
+  `Recompute` does **not** break the document on 17 (verified on 17.7.0). On `main` the `401`/`403`
+  duplicate-key trap is real; see that branch's AGENTS.md before copying such an attribute across.
 
 ## What matters in this package
 
@@ -207,12 +226,16 @@ statistics are not arbitrary.** In particular:
   control looking blank once selected. Use a non-empty sentinel - `ANY_OPTION` in
   `Client/src/dashboards/shared.ts`.
 - Package migrations are gated on `Umbraco:CMS:Unattended:PackageMigrationsUnattended`, **not**
-  anything under `Umbraco:CMS:PackageMigration:`, and Umbraco 18 runs them in a background service
-  **after** Kestrel starts - so middleware is live while the tables do not yet exist. Guard database
-  work on `IRuntimeState.Level == RuntimeLevel.Run`.
-- **`MigrationBase` does not exist in Umbraco 18.** Derive from `AsyncMigrationBase`, override
-  `MigrateAsync()`, and use `SqlSyntax.DoesTableExist(Context.Database, name)` - there is no
-  `TableExists` helper.
+  anything under `Umbraco:CMS:PackageMigration:`, and Umbraco 17 (like 18) runs them in a
+  background service **after** Kestrel starts - so middleware is live while the tables do not yet
+  exist. Guard database work on `IRuntimeState.Level == RuntimeLevel.Run`.
+- **Migrations derive from `AsyncMigrationBase`.** Umbraco 17 still has the synchronous
+  `MigrationBase`, but 18 removed it, so use the async base to keep the code identical to `main`:
+  override `MigrateAsync()`, and use `SqlSyntax.DoesTableExist(Context.Database, name)` - there is
+  no `TableExists` helper.
+- **Call `IEmailSender.SendAsync` with `expires` spelled out.** On 17 the two-argument
+  `SendAsync(message, emailType)` binds to an overload marked obsolete (CS0618); 18 has only the
+  four-parameter one, so naming `enableNotification` and `expires` compiles cleanly on both.
 
 ## The fixture
 
@@ -222,7 +245,7 @@ NEL is Chromium-only and late. Run `scripts/seed-error-fixture/seed.cs` with the
 rebases every timestamp so the fixture is always recent, and moves the aggregation watermark past it.
 Rows sit under **seeded.example** so they can never collide with genuine local reports.
 
-`src/Cms/uSync/v18` was re-exported from scratch, so it contains no delete tombstones and matches the
+`src/Cms/uSync/v17` was re-exported from scratch, so it contains no delete tombstones and matches the
 database exactly. A plain uSync Export **adds and updates files but never removes stale ones**, which
 is how a domain pointing at a long-deleted node survived in the original export - empty the folder
 first if you want a clean one.
@@ -241,10 +264,19 @@ ordinary selectors work against the backoffice. Log in at `#username-input` (typ
 `email`) and `#password-input`, submit `#umb-login-button`, and wait for the form explicitly -
 `isVisible()` does not wait and returns false before the page has rendered.
 
+To call the API from a logged-in Playwright page without an API user, `fetch` from the page with
+the header `Authorization: Bearer [redacted]` - literally that. The backoffice keeps its tokens in
+HttpOnly cookies (`__Host-umbAccessToken`) and sends that placeholder, which the server swaps for
+the cookie; a `fetch` without it gets a 401. Verified on 17.7.0.
+
 For server-side checks, get a token with the `.env` client credentials against
 `POST /umbraco/management/api/v1/security/back-office/token` (`grant_type=client_credentials`).
 **A fresh clone has no API user** - uSync does not export users, so create one in the backoffice
-first.
+first. **Restart the site afterwards.** On 17.7.0 with SQLite, creating an API user and its client
+credentials through the Management API left the database locked: the user was saved, but every
+later query - OpenIddict lookups, cache sync, server registration - timed out after 30 seconds,
+until a restart cleared it. Seen once, while porting; the same package calls, repeated on a fresh
+process without creating a user, ran cleanly.
 
 For database assertions the site runs on SQLite and there is no `sqlite3` CLI on this machine. Use a
 file-based C# script - `dotnet run q.cs` with `#:package Microsoft.Data.Sqlite@10.0.10` on the first

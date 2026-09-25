@@ -6,11 +6,11 @@
   "scripts": {
     "watch": "node scripts/check-lang.mjs && tsc && vite build --watch",
     "build": "node scripts/check-lang.mjs && tsc && vite build",
-    "generate-client": "node scripts/generate-openapi.js https://localhost:44366/umbraco/openapi/errordashboard.json"
+    "generate-client": "node scripts/generate-openapi.js https://localhost:44366/umbraco/swagger/errordashboard/swagger.json"
   },
   "devDependencies": {
     "@hey-api/openapi-ts": "^0.99.0",
-    "@umbraco-cms/backoffice": "^18.2.0",
+    "@umbraco-cms/backoffice": "^17.7.0",
     "chalk": "^5.6.2",
     "cross-env": "^10.1.0",
     "node-fetch": "^3.3.2",

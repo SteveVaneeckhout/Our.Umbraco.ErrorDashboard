@@ -289,7 +289,7 @@ on boot. The gate is `Umbraco:CMS:Unattended:PackageMigrationsUnattended` (defau
 anything under `Umbraco:CMS:PackageMigration:`. If an operator has turned it off, the tables are
 never created and the package silently collects nothing.
 
-Umbraco 18 runs package migrations in a background service *after* Kestrel starts, so on the first
+Umbraco 17, like 18, runs package migrations in a background service *after* Kestrel starts, so on the first
 boot after installing this package the collector is already accepting POSTs while the tables do not
 yet exist. Everything touching the database guards on `IRuntimeState.Level == RuntimeLevel.Run`.
 
@@ -326,7 +326,7 @@ themselves — SQLite renders it as `TEXT`, and the `double` columns as `REAL`.
 ## API
 
 All under `/umbraco/errordashboard/api/v1/`, requiring Settings section access. Browsable at
-`/umbraco/openapi` under the `errordashboard` document.
+`/umbraco/swagger` under the `errordashboard` document.
 
 | Route | Notes |
 | --- | --- |

@@ -1,19 +1,23 @@
+using Asp.Versioning;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Mvc.ApiExplorer;
+using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using Microsoft.OpenApi;
 using Our.Umbraco.ErrorDashboard.Alerting;
 using Our.Umbraco.ErrorDashboard.Configuration;
 using Our.Umbraco.ErrorDashboard.Jobs;
 using Our.Umbraco.ErrorDashboard.Middleware;
 using Our.Umbraco.ErrorDashboard.Reporting;
 using Our.Umbraco.ErrorDashboard.Services;
+using Swashbuckle.AspNetCore.SwaggerGen;
 using Umbraco.Cms.Api.Common.OpenApi;
 using Umbraco.Cms.Api.Management.OpenApi;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Web.Common.ApplicationBuilder;
 using Umbraco.Extensions;
-using UmbConstants = Umbraco.Cms.Core.Constants;
 
 namespace Our.Umbraco.ErrorDashboard.Composers;
 
@@ -90,17 +94,71 @@ public class ErrorDashboardApiComposer : IComposer
                 PrePipeline = app => app.UseMiddleware<NelPolicyMiddleware>(),
             }));
 
-    private static void RegisterOpenApiDocument(IUmbracoBuilder builder) =>
-        builder.AddBackOfficeOpenApiDocument(
-            Constants.ApiName,
-            document => document
-                .WithTitle("Error Dashboard Backoffice API")
-                .WithBackOfficeAuthentication()
-                .WithJsonOptions(UmbConstants.JsonOptionsNames.BackOffice)
-                .ConfigureOpenApiOptions(options =>
-                    options.AddDocumentTransformer((doc, _, _) =>
-                    {
-                        doc.Info.Version = "1.0";
-                        return Task.CompletedTask;
-                    })));
+    /// <summary>
+    ///     Umbraco 17 generates OpenAPI with Swashbuckle; the document is served at
+    ///     <c>/umbraco/swagger/errordashboard/swagger.json</c>. See
+    ///     https://docs.umbraco.com/umbraco-cms/17.latest/tutorials/creating-a-backoffice-api
+    /// </summary>
+    private static void RegisterOpenApiDocument(IUmbracoBuilder builder)
+    {
+        builder.Services.AddSingleton<IOperationIdHandler, ErrorDashboardOperationIdHandler>();
+
+        builder.Services.Configure<SwaggerGenOptions>(options =>
+        {
+            options.SwaggerDoc(Constants.ApiName, new OpenApiInfo
+            {
+                Title = "Error Dashboard Backoffice API",
+                Version = "1.0",
+            });
+
+            options.OperationFilter<ErrorDashboardOperationSecurityFilter>();
+        });
+    }
+
+    /// <summary>Marks every operation in this package's document as requiring backoffice authentication.</summary>
+    public class ErrorDashboardOperationSecurityFilter : BackOfficeSecurityRequirementsOperationFilterBase
+    {
+        protected override string ApiName => Constants.ApiName;
+    }
+
+    /// <summary>
+    ///     Names operations HTTP method + route (<c>GetAlerts</c>, <c>PutSubscription</c>), which is what
+    ///     the generated TypeScript client's function names (<c>getAlerts</c>, <c>putSubscription</c>) are
+    ///     derived from. The Umbraco 18 line gets the same names from its own OpenAPI generator, so the
+    ///     client stays identical across both lines.
+    /// </summary>
+    /// <remarks>
+    ///     The route, not the action: <c>UpdateSubscription</c> is mapped to <c>PUT subscription</c>, and
+    ///     naming it after the action would rename the client's <c>putSubscription</c>.
+    /// </remarks>
+    public class ErrorDashboardOperationIdHandler : OperationIdHandler
+    {
+        public ErrorDashboardOperationIdHandler(IOptions<ApiVersioningOptions> apiVersioningOptions)
+            : base(apiVersioningOptions)
+        {
+        }
+
+        protected override bool CanHandle(
+            ApiDescription apiDescription,
+            ControllerActionDescriptor controllerActionDescriptor)
+            => controllerActionDescriptor.ControllerTypeInfo.Namespace?.StartsWith(
+                "Our.Umbraco.ErrorDashboard.Controllers",
+                StringComparison.Ordinal) is true;
+
+        public override string Handle(ApiDescription apiDescription)
+        {
+            string method = apiDescription.HttpMethod ?? "Get";
+
+            // The last literal route segment - "subscription" from
+            // "umbraco/errordashboard/api/v1/subscription" - with kebab-case PascalCased word by word.
+            string segment = (apiDescription.RelativePath ?? string.Empty)
+                .Split('/', StringSplitOptions.RemoveEmptyEntries)
+                .Last(part => part.StartsWith('{') is false);
+            string route = string.Concat(
+                segment.Split('-', StringSplitOptions.RemoveEmptyEntries)
+                    .Select(word => char.ToUpperInvariant(word[0]) + word[1..]));
+
+            return $"{char.ToUpperInvariant(method[0])}{method[1..].ToLowerInvariant()}{route}";
+        }
+    }
 }
