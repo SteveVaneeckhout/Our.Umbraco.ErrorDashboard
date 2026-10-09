@@ -50,6 +50,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <InternalsVisibleTo Include="Our.Umbraco.ErrorDashboard.Tests" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Include="..\..\docs\img\icon.png" Pack="true" PackagePath="\" Visible="false" />
     <None Include="..\..\README.md" Pack="true" PackagePath="\" Visible="false" />
   </ItemGroup>
