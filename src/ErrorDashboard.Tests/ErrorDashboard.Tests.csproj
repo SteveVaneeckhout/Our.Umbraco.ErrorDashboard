@@ -18,7 +18,7 @@
       replaced the xunit stack: xunit, xunit.runner.visualstudio and coverlet.collector were the
       only third-party dependencies in the solution.
     -->
-    <PackageReference Include="MSTest" Version="4.4.1" />
+    <PackageReference Include="MSTest" Version="4.5.2" />
   </ItemGroup>
 
   <ItemGroup>
