@@ -24,6 +24,7 @@ browser  --POST /nel-report------->  NelPolicyMiddleware   (terminal branch, 204
                                      NelReportWriterService (batches every 5s)
                                           |
                                      errorDashboardNelReport
+                                          |  └─> ErrorReportsReceivedNotification (per stored batch)
                                           |
                                      ErrorDashboardAggregationJob (hourly)
                                        aggregate -> alert -> prune
@@ -91,6 +92,25 @@ under load always beats stalling a request.
 Writes use NPoco's `InsertBatch`, **not** Umbraco's `BulkInsertRecords`. On SQL Server the latter
 goes through `SqlBulkCopy`, whose schema reader throws `numericPrecision must be specified for
 "float" type columns` on any `double` column — which `samplingFraction` is.
+
+### Stored batches are published as a notification
+
+After each batch is written, the writer publishes `ErrorReportsReceivedNotification` through
+Umbraco's `IEventAggregator`. This lets site code forward reports elsewhere without touching the
+collector.
+
+- **It is published from the writer, not the collector.** A handler that called Grafana from the
+  middleware would put a remote API into every browser's report upload.
+- **It is published only after the write succeeds.** Every handler then sees exactly the rows the
+  dashboards count, and a batch the database refused is published to no one. The batch is copied and
+  cleared *before* publishing. If a shutdown cancelled a handler while the rows were still in the
+  batch, the shutdown flush would store them a second time.
+- **The payload is `ErrorReport`, a read-only copy, not `NelReportDto`.** Handlers cannot alter
+  stored rows or come to depend on the table layout. It has no `Id`, because NPoco's
+  `InsertBatch` does not read back generated keys. A test fails if a new column is neither copied
+  nor listed as storage-only.
+- **Handler exceptions are caught inside the publish call.** If they reached the drain loop, the loop
+  would back off for thirty seconds over a batch that had been stored perfectly well.
 
 ### Aggregation is watermarked, and buckets on when the error happened
 

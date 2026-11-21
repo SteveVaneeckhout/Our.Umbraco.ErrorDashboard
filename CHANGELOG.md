@@ -7,6 +7,10 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- `ErrorReportsReceivedNotification`, published after each batch of reports is stored, so site code can forward reports to Grafana, a log pipeline or anywhere else.
+
 ## [17.0.0] - 2026-09-26
 
 The Umbraco 17 LTS line, built from the `v17/main` branch. Same features as 18.0.0, pinned to

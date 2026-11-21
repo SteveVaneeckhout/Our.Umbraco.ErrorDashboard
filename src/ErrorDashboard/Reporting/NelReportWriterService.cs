@@ -1,8 +1,10 @@
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using NPoco;
+using Our.Umbraco.ErrorDashboard.Notifications;
 using Our.Umbraco.ErrorDashboard.Persistence.Dtos;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Scoping;
 
@@ -26,6 +28,7 @@ public sealed class NelReportWriterService : BackgroundService
     /// <summary>Backoff after a failed write, so a database outage does not become a hot loop.</summary>
     private static readonly TimeSpan ErrorBackoff = TimeSpan.FromSeconds(30);
 
+    private readonly IEventAggregator _eventAggregator;
     private readonly ILogger<NelReportWriterService> _logger;
     private readonly NelReportQueue _queue;
     private readonly IRuntimeState _runtimeState;
@@ -35,11 +38,13 @@ public sealed class NelReportWriterService : BackgroundService
         NelReportQueue queue,
         IScopeProvider scopeProvider,
         IRuntimeState runtimeState,
+        IEventAggregator eventAggregator,
         ILogger<NelReportWriterService> logger)
     {
         _queue = queue;
         _scopeProvider = scopeProvider;
         _runtimeState = runtimeState;
+        _eventAggregator = eventAggregator;
         _logger = logger;
     }
 
@@ -69,7 +74,13 @@ public sealed class NelReportWriterService : BackgroundService
                 }
 
                 Write(batch);
+
+                // Snapshot and clear before publishing: a shutdown that cancels a handler would otherwise
+                // leave the rows in the batch, and the flush below would store them a second time.
+                ErrorReport[] stored = Snapshot(batch);
                 batch.Clear();
+
+                await PublishAsync(stored, stoppingToken);
             }
             catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
             {
@@ -103,7 +114,10 @@ public sealed class NelReportWriterService : BackgroundService
             catch (Exception ex)
             {
                 _logger.LogWarning(ex, "Could not flush {Count} buffered report(s) during shutdown.", batch.Count);
+                return;
             }
+
+            await PublishAsync(Snapshot(batch), CancellationToken.None);
         }
     }
 
@@ -148,5 +162,34 @@ public sealed class NelReportWriterService : BackgroundService
         scope.Complete();
 
         _logger.LogDebug("Persisted {Count} network error report(s).", batch.Count);
+    }
+
+    private static ErrorReport[] Snapshot(List<NelReportDto> batch) => batch.Select(ErrorReport.FromDto).ToArray();
+
+    /// <summary>
+    ///     Tells any <see cref="ErrorReportsReceivedNotification" /> handlers about rows already stored.
+    /// </summary>
+    /// <remarks>
+    ///     A throwing handler is third-party code, so it is logged and contained here: letting it reach
+    ///     the drain loop would back off for thirty seconds over a batch that was written perfectly well.
+    /// </remarks>
+    private async Task PublishAsync(ErrorReport[] reports, CancellationToken cancellationToken)
+    {
+        try
+        {
+            await _eventAggregator.PublishAsync(new ErrorReportsReceivedNotification(reports), cancellationToken);
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+            throw;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(
+                ex,
+                "A handler for {Notification} failed on {Count} report(s). The reports are stored; only the handler missed them.",
+                nameof(ErrorReportsReceivedNotification),
+                reports.Length);
+        }
     }
 }

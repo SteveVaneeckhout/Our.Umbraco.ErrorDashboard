@@ -88,6 +88,63 @@ operational non-event), a minimum ratio to the median, and a cooldown per host.
 Email needs `Umbraco:CMS:Global:Smtp` configured with a `From` address and either a `Host` or a
 `PickupDirectoryLocation`. Without it, Umbraco's sender quietly does nothing.
 
+## Sending reports elsewhere
+
+Every stored report is also published as an Umbraco notification, so your own code can forward it
+to Grafana, a log pipeline or anywhere else. `ErrorReportsReceivedNotification` arrives once per
+batch, after the batch is in the database, and `Reports` holds the batch.
+
+This handler counts 404s on a `System.Diagnostics.Metrics` counter. If the site already exports
+metrics through OpenTelemetry (to Grafana Cloud, Prometheus or Mimir), add the meter name to that
+setup and the counter shows up beside your other metrics:
+
+```csharp
+using System.Diagnostics.Metrics;
+using Our.Umbraco.ErrorDashboard.Notifications;
+using Umbraco.Cms.Core.Composing;
+using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Events;
+
+public class NotFoundMetricsComposer : IComposer
+{
+    public void Compose(IUmbracoBuilder builder) =>
+        builder.AddNotificationAsyncHandler<ErrorReportsReceivedNotification, NotFoundMetricsHandler>();
+}
+
+public class NotFoundMetricsHandler : INotificationAsyncHandler<ErrorReportsReceivedNotification>
+{
+    private static readonly Meter Meter = new("MySite.ErrorReports");
+    private static readonly Counter<double> NotFound = Meter.CreateCounter<double>("site.not_found");
+
+    public Task HandleAsync(ErrorReportsReceivedNotification notification, CancellationToken cancellationToken)
+    {
+        foreach (ErrorReport report in notification.Reports)
+        {
+            if (report.StatusCode == 404 && !report.IsSuccess)
+            {
+                // Weight, not 1: with FailureFraction below 1, each report stands for several requests.
+                NotFound.Add(report.Weight, new KeyValuePair<string, object?>("host", report.Host));
+            }
+        }
+
+        return Task.CompletedTask;
+    }
+}
+```
+
+Things to know:
+
+- **Handlers run on the background writer, never in a visitor's request, but the writer waits for
+  them.** A slow handler holds up storage. If you call a remote API, send the whole batch in one
+  request, or hand the reports to your own queue and return.
+- **A handler that throws is logged and ignored.** The reports are already stored.
+- **Handlers have no HTTP request and no DI scope.** Umbraco resolves them from the root provider, so
+  inject `IServiceScopeFactory` rather than a scoped service.
+- **`Path` has no upper limit on distinct values.** Put it in log lines (Loki, say), not in metric
+  labels.
+- **Reports arrive late.** Use `OccurredUtc`, not the time your handler ran, wherever the timestamp
+  matters.
+
 ## Configuration
 
 Everything has a working default; the whole section is optional.
