@@ -23,10 +23,10 @@
 
   <!-- Per-project - with versions -->
   <ItemGroup>
-    <PackageReference Include="Umbraco.Cms.Api.Common" Version="[17.7.0,18.0.0)" />
-    <PackageReference Include="Umbraco.Cms.Api.Management" Version="[17.7.0,18.0.0)" />
-    <PackageReference Include="Umbraco.Cms.Web.Common" Version="[17.7.0,18.0.0)" />
-    <PackageReference Include="Umbraco.Cms.Web.Website" Version="[17.7.0,18.0.0)" />
+    <PackageReference Include="Umbraco.Cms.Api.Common" Version="[17.8.0, 18.0.0)" />
+    <PackageReference Include="Umbraco.Cms.Api.Management" Version="[17.8.0, 18.0.0)" />
+    <PackageReference Include="Umbraco.Cms.Web.Common" Version="[17.8.0, 18.0.0)" />
+    <PackageReference Include="Umbraco.Cms.Web.Website" Version="[17.8.0, 18.0.0)" />
 
     <!--
       Umbraco 17 still generates OpenAPI with Swashbuckle. The composer uses its SwaggerGenOptions
